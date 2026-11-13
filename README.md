@@ -1,10 +1,8 @@
-# Fire or Factory? (Brand eller bruk?)
+# Fire or Factory?
 
 A cleaned satellite fire record for Sweden. It merges NASA MODIS and VIIRS hotspot detections into one validated dataset, and uses a classifier to separate real vegetation fires from industrial heat sources such as steelworks and pulp mills.
 
-> **Status: scaffold only.** Tooling and structure were committed before the weekend. Project work started **Saturday 14 Nov 2026, 09:00 (Europe/Stockholm)**. See the commit history.
-
-Built solo during the NASA Space Apps Challenge 2026 weekend (14-15 Nov) for the challenge *Harmonization of MODIS and VIIRS Hot Spots*, as a personal project (not an official submission).
+Built solo during the NASA Space Apps Challenge 2026 weekend (14-15 Nov) for the challenge _Harmonization of MODIS and VIIRS Hot Spots_, as a personal project (not an official submission).
 
 ## The question
 

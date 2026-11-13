@@ -1,0 +1,45 @@
+[project]
+name = "fof"
+version = "0.0.0"
+description = "Fire or Factory? A cleaned satellite fire record for Sweden (MODIS + VIIRS)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+    "pandas>=2.2",
+    "pyarrow>=16",
+    "duckdb>=1.0",
+    "pandera>=0.20",
+    "scikit-learn>=1.5",
+    "lightgbm>=4.5",
+    "streamlit>=1.40",
+    "pydeck>=0.9",
+]
+
+[project.scripts]
+fof = "fof.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fof"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "app"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

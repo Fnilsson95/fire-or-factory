@@ -1,0 +1,7 @@
+# Used by Streamlit Community Cloud for the deployed app only.
+# The full development environment is defined in pyproject.toml (uv).
+streamlit>=1.40
+pydeck>=0.9
+pandas>=2.2
+pyarrow>=16
+duckdb>=1.0

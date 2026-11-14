@@ -22,7 +22,7 @@ URL = (
     "v5.1.2/geojson/ne_10m_admin_0_countries.geojson"
 )
 
-OUT = Path("data/ref/sweden_clip_geojson")
+OUT = Path("data/ref/sweden_clip.geojson")
 BUFFER_KM = 2.0
 REF_LAT = 62.0  # roughly Sweden midpoint
 

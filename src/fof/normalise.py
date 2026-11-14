@@ -38,7 +38,7 @@ RENAME = {
 SATELLITE = {"Terra": "Terra", "Aqua": "Aqua", "T": "Terra", "A": "Aqua",
              "N": "SNPP", "N20": "NOAA-20"}
 
-VIIRS_CONFIDENCE = {"l": "low", "n": "normal", "h": "high"}
+VIIRS_CONFIDENCE = {"l": "low", "n": "nominal", "h": "high"}
 
 COLUMNS = [
     "datetime_utc", "date_utc", "source", "family", "satellite", 
@@ -74,7 +74,7 @@ SCHEMA = pa.DataFrameSchema(
 
 def read_source(source: str, raw_dir: Path = RAW_DIR) -> pd.DataFrame:
     """All raw files for one source stacked into one table with a "source" column"""
-    
+
     frames = [
         pd.read_csv(f, dtype={"confidence": str, "version": str})
         for f in sorted(raw_dir.glob(f"{source}_*.csv"))

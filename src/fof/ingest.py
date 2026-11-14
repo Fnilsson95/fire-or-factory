@@ -25,6 +25,9 @@ SWEDEN_BBOX = (10.9, 55.3, 24.2, 69.1)
 SOURCES = ("MODIS_SP", "VIIRS_SNPP_SP", "VIIRS_NOAA20_SP")
 MAX_DAYS = 5  # API limit per request
 RAW_DIR = Path("data/raw")
+STATUS_URL = "https://firms.modaps.eosdis.nasa.gov/mapserver/mapkey_status/"
+QUOTA_WAIT_S = 60  # seconds to wait before checking the quota again
+
 
 
 # Read the env file
@@ -45,22 +48,40 @@ def chunks(start: date, end: date, size: int = MAX_DAYS):
         current += timedelta(days=n)
 
 
+def quota_used_up(client: httpx.Client, key: str) -> bool:
+    """True if the key has used all its transactions for the current 10-minute window."""
+    try:
+        status = client.get(STATUS_URL, params={"MAP_KEY": key}, timeout=30).json()
+    except (httpx.HTTPError, ValueError):
+        return False  # can't tell; let the normal error handling below decide
+    return status["current_transactions"] >= status["transaction_limit"]
+
+
 def fetch_chunk(client: httpx.Client, key: str, source: str, start: date, n_days: int) -> str:
     bbox = ",".join(str(v) for v in SWEDEN_BBOX)
     url = f"{API}/{key}/{source}/{bbox}/{n_days}/{start.isoformat()}"
-    for attempt in range(4):
+    attempt = 0
+    while True:
         try:
             response = client.get(url, timeout=60)
+            # Over quota, FIRMS answers 400 "Invalid MAP_KEY" even though the key is fine.
+            # Wait for the 10-minute window to free up instead of failing.
+            if response.status_code == 400 and quota_used_up(client, key):
+                print(f"  FIRMS quota used up at {source} {start}, waiting {QUOTA_WAIT_S} s",
+                      flush=True)
+                time.sleep(QUOTA_WAIT_S)
+                continue
             response.raise_for_status()
             return response.text
         except httpx.HTTPError as exc:
-            if attempt == 3:
+            attempt += 1
+            if attempt == 4:
                 # Do not chain the original error: its message contains the URL, and the URL
                 # contains the API key.
                 status = getattr(getattr(exc, "response", None), "status_code", "n/a")
                 raise RuntimeError(f"FIRMS req failed: {source} {start} (HTTP {status})") from None
             time.sleep(2**attempt)
-    raise AssertionError("unreachable")
+
 
 
 def download(

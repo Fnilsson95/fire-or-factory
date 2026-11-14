@@ -23,6 +23,8 @@ fof = "fof.cli:main"
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
     "pytest>=8",
     "ruff>=0.6",
 ]

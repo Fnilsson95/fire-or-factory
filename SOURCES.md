@@ -11,6 +11,10 @@ Add every dataset, library, paper and tutorial used, as it is used.
 - [NASA Earthdata: MODIS NRT (MCD14DL)](https://www.earthdata.nasa.gov/learn/find-data/near-real-time/firms/mcd14dl)
 - [NASA Earthdata: FIRMS features to identify fires by type](https://www.earthdata.nasa.gov/news/blog/firms-releases-new-features-identify-active-fires-type)
 
+## Geography
+
+- [Natural Earth 1:10m Admin 0 Countries, v5.1.2](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/) (public domain), via [natural-earth-vector](https://github.com/nvkelso/natural-earth-vector)
+
 ## Sweden background
 
 - [Granström (2023), En samlad svensk databas för bränder i skog och mark, SLU Rapport Skog 2023:1](https://pub.epsilon.slu.se/id/document/20444814)

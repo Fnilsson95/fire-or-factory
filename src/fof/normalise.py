@@ -35,16 +35,36 @@ RENAME = {
     "type": "firms_type",
 }
 
-SATELLITE = {"Terra": "Terra", "Aqua": "Aqua", "T": "Terra", "A": "Aqua",
-             "N": "SNPP", "N20": "NOAA-20"}
+SATELLITE = {
+    "Terra": "Terra",
+    "Aqua": "Aqua",
+    "T": "Terra",
+    "A": "Aqua",
+    "N": "SNPP",
+    "N20": "NOAA-20",
+}
 
 VIIRS_CONFIDENCE = {"l": "low", "n": "nominal", "h": "high"}
 
 COLUMNS = [
-    "datetime_utc", "date_utc", "source", "family", "satellite", 
-    "latitude", "longitude", "scan_km", "track_km",
-    "bt_fire", "bt_background", "frp", "daynight",
-    "confidence_raw", "confidence_class", "firms_type", "firms_static", "version",
+    "datetime_utc",
+    "date_utc",
+    "source",
+    "family",
+    "satellite",
+    "latitude",
+    "longitude",
+    "scan_km",
+    "track_km",
+    "bt_fire",
+    "bt_background",
+    "frp",
+    "daynight",
+    "confidence_raw",
+    "confidence_class",
+    "firms_type",
+    "firms_static",
+    "version",
 ]
 
 SCHEMA = pa.DataFrameSchema(
@@ -72,6 +92,7 @@ SCHEMA = pa.DataFrameSchema(
     strict=True,
 )
 
+
 def read_source(source: str, raw_dir: Path = RAW_DIR) -> pd.DataFrame:
     """All raw files for one source stacked into one table with a "source" column"""
 
@@ -86,15 +107,17 @@ def read_source(source: str, raw_dir: Path = RAW_DIR) -> pd.DataFrame:
     df["source"] = source
     return df
 
+
 def confidence_class(df: pd.DataFrame) -> pd.Series:
-    """VIIRS l/n/h and MODIS 0-100 on one scale 
-       (FIRMS MODIES <30 low, 30-79 normal, 80+ high)
+    """VIIRS l/n/h and MODIS 0-100 on one scale
+    (FIRMS MODIES <30 low, 30-79 normal, 80+ high)
     """
 
     viirs = df["confidence_raw"].map(VIIRS_CONFIDENCE)
     modis_pct = pd.to_numeric(df["confidence_raw"], errors="coerce")
     modis = pd.cut(modis_pct, bins=[-1, 29, 79, 100], labels=["low", "nominal", "high"])
     return viirs.where(df["family"] == "VIIRS", modis.astype(str))
+
 
 def harmonise(df: pd.DataFrame) -> pd.DataFrame:
     """One raw source table into the unified schema."""

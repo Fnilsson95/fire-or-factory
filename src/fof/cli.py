@@ -23,7 +23,7 @@ normalise --> Harmonises all raw files into one validated table "data/clean/dete
 import argparse
 from datetime import date
 
-from fof import __version__, ingest, normalise
+from fof import __version__, ingest, normalise, features
 
 
 # argument vector
@@ -37,6 +37,7 @@ def main(argv: list[str] | None = None) -> int:
     ing.add_argument("--end", required=True, type=date.fromisoformat)
     ing.add_argument("--sources", nargs="+", default=list(ingest.SOURCES))
     sub.add_parser("normalise", help="harmonise raw files into data/clean/detections.parquet")
+    sub.add_parser("features", help="add grid-cell and detection features -> features.parquet")
 
     args = parser.parse_args(argv)
     if args.command == "ingest":
@@ -46,6 +47,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "normalise":
         normalise.normalise()
+        return 0
+
+    if args.command == "features":
+        features.build_features()
         return 0
     parser.print_help()
     return 0

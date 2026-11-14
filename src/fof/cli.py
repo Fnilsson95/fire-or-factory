@@ -13,12 +13,17 @@ ingest --> Download raw FIRMS detections for Sweden into data/raw/
     -- start (first date REQUIRED)
     -- end (last date REQUIRED)
     --sources MODIS_SP, VIIRS_SNPP_SP, VIIRS_NOAA20_SP (default: all three)
+
+normalise --> Harmonises all raw files into one validated table "data/clean/detections.parquet"
+              Same column names for both MODIS and VIIRS
+
+              uv run fof normalise
 """
 
 import argparse
 from datetime import date
 
-from fof import __version__, ingest
+from fof import __version__, ingest, normalise
 
 
 # argument vector
@@ -31,11 +36,16 @@ def main(argv: list[str] | None = None) -> int:
     ing.add_argument("--start", required=True, type=date.fromisoformat)
     ing.add_argument("--end", required=True, type=date.fromisoformat)
     ing.add_argument("--sources", nargs="+", default=list(ingest.SOURCES))
+    sub.add_parser("normalise", help="harmonise raw files into data/clean/detections.parquet")
 
     args = parser.parse_args(argv)
     if args.command == "ingest":
         paths = ingest.download(args.start, args.end, tuple(args.sources))
         print(f"{len(paths)} raw files in {ingest.RAW_DIR}")
+        return 0
+
+    if args.command == "normalise":
+        normalise.normalise()
         return 0
     parser.print_help()
     return 0

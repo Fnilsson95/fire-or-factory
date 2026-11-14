@@ -26,7 +26,8 @@ OUT = Path("data/ref/sweden_clip_geojson")
 BUFFER_KM = 2.0
 REF_LAT = 62.0  # roughly Sweden midpoint
 
-def country(features: list[dict], name: str): 
+
+def country(features: list[dict], name: str):
     """Return the shape of one country. Matched on ADMIN - full name of country"""
 
     for f in features:
@@ -34,9 +35,10 @@ def country(features: list[dict], name: str):
             return shape(f["geometry"])
     raise KeyError(f"{name} not found in Natural Earth file")
 
+
 def buffer_km(geom, km: float, ref_lat: float = REF_LAT):
     """Grow a longitude/latitude shape by roughly "km" in every direction
-    
+
     A degree of longitude is shorter than a degree of latitude this far north
     Therefore we squash longitude to match, buffer and then stretch back
 
@@ -44,7 +46,7 @@ def buffer_km(geom, km: float, ref_lat: float = REF_LAT):
 
     k = math.cos(math.radians(ref_lat))
     squashed = affinity.scale(geom, xfact=k, yfact=1, origin=(0, 0))
-    grown = squashed.buffer(km / 111.32) # 1 degree of latitude is about 111.32 km
+    grown = squashed.buffer(km / 111.32)  # 1 degree of latitude is about 111.32 km
     return affinity.scale(grown, xfact=1 / k, yfact=1, origin=(0, 0))
 
 
@@ -68,7 +70,7 @@ def main() -> None:
     for label, (lon, lat, expected) in checks.items():
         inside = clip.contains(Point(lon, lat))
         status = "ok" if inside == expected else "FAIL"
-        print (f"   [{status}] {label}: inside={inside}")
+        print(f"   [{status}] {label}: inside={inside}")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     feature = {

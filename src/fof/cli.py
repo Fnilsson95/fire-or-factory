@@ -1,4 +1,19 @@
-"""Command line entry point: "fof" """
+"""Command line entry point: "fof" 
+
+Run from the repo root (FIRMS_MAP_KEY must be set in .env file)
+
+    * uv run fof --help                 (list commands)
+    * uv run fof --version              (print the version)
+    * uv run fof ingest --help          (options for a command)
+
+ingest --> Download raw FIRMS detections for Sweden into data/raw/
+           uv run fof ingest --start 2018-07-01 --end 2018-07-31
+           uv run fof ingest --start 2018-01-01 --end 2018-12-31 --sources MODIS_SP
+
+    -- start (first date REQUIRED)
+    -- end (last date REQUIRED)
+    --sources MODIS_SP, VIIRS_SNPP_SP, VIIRS_NOAA20_SP (default: all three)
+"""
 
 import argparse
 from datetime import date

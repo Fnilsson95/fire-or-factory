@@ -16,6 +16,7 @@ dependencies = [
     "lightgbm>=4.5",
     "streamlit>=1.40",
     "pydeck>=0.9",
+    "shapely>=2.2.0",
 ]
 
 [project.scripts]

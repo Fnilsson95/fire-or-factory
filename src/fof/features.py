@@ -18,17 +18,23 @@ import pandas as pd
 from fof.normalise import OUT_PATH as DETECTIONS_PATH
 
 OUT_PATH = Path("data/clean/features.parquet")
-CELL_KM = 1.0 # grid size 
+CELL_KM = 1.0  # grid size
 KM_PER_DEG_LAT = 111.32
 CONFIDENCE_RANK = {"low": 0, "nominal": 1, "high": 2}
 
 DETECTION_FEATURES = ["frp", "bt_diff", "is_night", "is_viirs", "confidence_rank", "day_of_year"]
 CELL_FEATURES = [
-    "cell_detections", "cell_days", "cell_months", "cell_years",
-    "cell_span_days", "cell_night_share", "cell_frp_median"
+    "cell_detections",
+    "cell_days",
+    "cell_months",
+    "cell_years",
+    "cell_span_days",
+    "cell_night_share",
+    "cell_frp_median",
 ]
 
 FEATURES = DETECTION_FEATURES + CELL_FEATURES
+
 
 def add_detection_features(df: pd.DataFrame) -> pd.DataFrame:
     """Featutes from the single observation"""
@@ -45,7 +51,7 @@ def add_detection_features(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_cell_id(df: pd.DataFrame, cell_km: float = CELL_KM) -> pd.DataFrame:
     """Put each detection in a grid cell of roughly cell_km * cell_km
-    
+
     Latituyde degrees are roughly 111km everywhere, but longitude degrees shrink with cos(latitude)
     so we convert both to km before cutting into cells
     """
@@ -75,7 +81,7 @@ def cell_features(df: pd.DataFrame):
 
 
 def build_features(
-        in_path: Path = DETECTIONS_PATH, out_path: Path = OUT_PATH, cell_km: float = CELL_KM
+    in_path: Path = DETECTIONS_PATH, out_path: Path = OUT_PATH, cell_km: float = CELL_KM
 ) -> pd.DataFrame:
     """Read the clean detections, add all features, write features.parquet"""
     df = pd.read_parquet(in_path)

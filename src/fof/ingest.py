@@ -58,7 +58,7 @@ def fetch_chunk(client: httpx.Client, key: str, source: str, start: date, n_days
                 # Do not chain the original error: its message contains the URL, and the URL
                 # contains the API key.
                 status = getattr(getattr(exc, "response", None), "status_code", "n/a")
-                raise RuntimeError(f"FIRMS request failed: {source} {start} (HTTP {status})") from None
+                raise RuntimeError(f"FIRMS req failed: {source} {start} (HTTP {status})") from None
             time.sleep(2**attempt)
     raise AssertionError("unreachable")
 
@@ -82,6 +82,8 @@ def download(
                     continue
                 text = fetch_chunk(client, key, source, chunk_start, n)
                 if text.lstrip().lower().startswith(("invalid", "error", "<")):
-                    raise RuntimeError(f"FIRMS returned an error for {source} {chunk_start}: {text[:100]}")
+                    raise RuntimeError(
+                        f"FIRMS returned error: {source} {chunk_start}: {text[:100]}"
+                    )
                 path.write_text(text)
     return paths

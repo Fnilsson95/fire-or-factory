@@ -1,4 +1,4 @@
-"""Command line entry point: "fof" 
+"""Command line entry point: "fof"
 
 Run from the repo root (FIRMS_MAP_KEY must be set in .env file)
 
@@ -19,6 +19,7 @@ import argparse
 from datetime import date
 
 from fof import __version__, ingest
+
 
 # argument vector
 def main(argv: list[str] | None = None) -> int:

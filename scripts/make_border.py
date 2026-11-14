@@ -12,7 +12,6 @@ import math
 from pathlib import Path
 
 import httpx
-
 from shapely import affinity
 from shapely.geometry import Point, mapping, shape
 from shapely.ops import unary_union

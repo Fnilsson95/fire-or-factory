@@ -1,5 +1,7 @@
 # Fire or Factory?
 
+**Live app:** https://fireorfactory.streamlit.app/
+
 A cleaned satellite fire record for Sweden. It merges 25 years of NASA MODIS and VIIRS hotspot detections into one validated dataset, and separates real vegetation fires from industrial heat sources such as steelworks, smelters, refineries and cement plants.
 
 Built during the NASA Space Apps Challenge 2026 weekend (14–15 Nov) for the challenge _Harmonization of MODIS and VIIRS Hot Spots_, as a personal project (not an official submission).

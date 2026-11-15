@@ -23,7 +23,8 @@ normalise --> Harmonises all raw files into one validated table "data/clean/dete
 import argparse
 from datetime import date
 
-from fof import __version__, features, fire_calendar, ingest, model, normalise
+from fof import __version__, export, features, fire_calendar, ingest, model, normalise
+
 
 
 # argument vector
@@ -40,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("features", help="add grid-cell and detection features -> features.parquet")
     sub.add_parser("classify", help="rule baseline + classifier -> classified.parquet")
     sub.add_parser("calendar", help="fire-days per year and month -> fire_calendar.csv")
+    sub.add_parser("export", help="write slim app data to app/data/ (commited)")
 
     args = parser.parse_args(argv)
     if args.command == "ingest":
@@ -65,6 +67,10 @@ def main(argv: list[str] | None = None) -> int:
         cal = fire_calendar.build_calendar()
         print("\nFire-days per month, both sensors, our cleaning:")
         print(fire_calendar.month_grid(cal).to_string())
+        return 0
+
+    if args.command == "export":
+        export.export_app_data()
         return 0
     parser.print_help()
     return 0

@@ -23,6 +23,7 @@ FAMILIES = {
 }
 
 st.set_page_config(page_title="Fire or Factory?", layout="wide")
+st.set_page_config(page_title="Fire or Factory?", page_icon="🔥", layout="wide")
 
 
 @st.cache_data

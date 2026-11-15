@@ -33,10 +33,15 @@ def rule_static(df: pd.DataFrame, min_months: int = RULE_MIN_MONTHS) -> pd.Serie
     """A cell active in at least "min_months" different months is static"""
     return df["cell_months"] >= min_months
 
+
 def make_model() -> lgb.LGBMClassifier:
     return lgb.LGBMClassifier(
-        n_estimators=200, learning_rate=0.05, num_leaves=15, min_child_samples=20,
-        random_state=42, verbose=-1,
+        n_estimators=200,
+        learning_rate=0.05,
+        num_leaves=15,
+        min_child_samples=20,
+        random_state=42,
+        verbose=-1,
     )
 
 
@@ -71,8 +76,10 @@ def classify(in_path: Path = FEATURES_PATH, out_path: Path = OUT_PATH) -> pd.Dat
     oof = cross_validated_scores(v)
     rule_acc = (v["rule_static"] == v["firms_static"]).mean()
     model_acc = ((oof >= THRESHOLD) == v["firms_static"]).mean()
-    print(f"VIIRS, unseen cells: rule accuracy {rule_acc:.3f} | "
-          f"model accuracy {model_acc:.3f}, ROC AUC {roc_auc_score(v['firms_static'], oof):.3f}")
+    print(
+        f"VIIRS, unseen cells: rule accuracy {rule_acc:.3f} | "
+        f"model accuracy {model_acc:.3f}, ROC AUC {roc_auc_score(v['firms_static'], oof):.3f}"
+    )
 
     # 2. Final model on all VIIRS labels, applied to every detection (MODIS included).
     model = make_model().fit(v[MODEL_FEATURES], v["firms_static"].astype(int))
@@ -106,9 +113,12 @@ def disagreements(df: pd.DataFrame, n: int = 15) -> pd.DataFrame:
         we_fire=~df["is_static"] & df["firms_static"],
     )
     cells = d.groupby(["cell_x", "cell_y"]).agg(
-        lat=("latitude", "mean"), lon=("longitude", "mean"),
-        we_static=("we_static", "sum"), we_fire=("we_fire", "sum"),
-        cell_days=("cell_days", "first"), cell_months=("cell_months", "first"),
+        lat=("latitude", "mean"),
+        lon=("longitude", "mean"),
+        we_static=("we_static", "sum"),
+        we_fire=("we_fire", "sum"),
+        cell_days=("cell_days", "first"),
+        cell_months=("cell_months", "first"),
         families=("family", lambda s: ",".join(sorted(set(s)))),
     )
     cells["disagree"] = cells["we_static"] + cells["we_fire"]

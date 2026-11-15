@@ -19,8 +19,17 @@ APP_DATA = Path("app/data")
 
 # Only what the app shows. Everything else stays in data/clean/.
 APP_COLUMNS = [
-    "latitude", "longitude", "date_utc", "year", "month", "family",
-    "firms_static", "is_static", "p_static", "cell_days", "cell_months",
+    "latitude",
+    "longitude",
+    "date_utc",
+    "year",
+    "month",
+    "family",
+    "firms_static",
+    "is_static",
+    "p_static",
+    "cell_days",
+    "cell_months",
 ]
 
 

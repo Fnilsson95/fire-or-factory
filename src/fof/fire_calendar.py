@@ -59,16 +59,18 @@ def build_calendar(in_path: Path = CLASSIFIED_PATH, out_path: Path = OUT_PATH) -
         for version in VERSIONS:
             counts = fire_days(sub[fire_mask(sub, version)])
             counts = counts.reindex(all_months, fill_value=0)
-            parts.append(counts.rename("fire_days").reset_index().assign(
-                family=family, version=version))
+            parts.append(
+                counts.rename("fire_days").reset_index().assign(family=family, version=version)
+            )
     cal = pd.concat(parts, ignore_index=True)[["year", "month", "family", "version", "fire_days"]]
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     cal.to_csv(out_path, index=False)
     print(f"wrote {out_path} ({len(cal):,} rows)")
 
-    yearly = cal.pivot_table(index=["year", "family"], columns="version",
-                             values="fire_days", aggfunc="sum")[list(VERSIONS)]
+    yearly = cal.pivot_table(
+        index=["year", "family"], columns="version", values="fire_days", aggfunc="sum"
+    )[list(VERSIONS)]
     yearly["removed_by_ours_%"] = (100 * (1 - yearly["ours"] / yearly["raw"])).round(1)
     print("\nFire-days per year:")
     print(yearly.to_string())

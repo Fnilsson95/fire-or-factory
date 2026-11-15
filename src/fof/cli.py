@@ -26,7 +26,6 @@ from datetime import date
 from fof import __version__, export, features, fire_calendar, ingest, model, normalise
 
 
-
 # argument vector
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="fof", description="Fire or Factory? pipeline")

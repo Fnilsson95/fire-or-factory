@@ -117,7 +117,6 @@ def build_features(
     cells = cells.join(block_features(cells))
     df = df.join(cells, on=["cell_x", "cell_y"])
 
-
     out_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out_path, index=False)
 

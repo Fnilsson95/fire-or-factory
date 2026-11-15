@@ -1,6 +1,6 @@
 """Fire or Factory? A cleaned satellite fire record for Sweden.
 
-Reads only the small files in app/data/ (written by `fof export`), so it runs anywhere.
+Reads only the small files in app/data/ so it runs anywhere.
 """
 
 from pathlib import Path
@@ -16,8 +16,11 @@ DATA = HERE / "data"
 FIRE = [230, 85, 13]  # orange
 FACTORY = [49, 130, 189]  # blue
 VERSIONS = {"ours": "Our cleaning", "firms": "FIRMS labels", "raw": "Raw (no cleaning)"}
-FAMILIES = {"ALL": "MODIS + VIIRS", "MODIS": "MODIS only (from 2000)",
-            "VIIRS": "VIIRS only (from 2012)"}
+FAMILIES = {
+    "ALL": "MODIS + VIIRS",
+    "MODIS": "MODIS only (from 2000)",
+    "VIIRS": "VIIRS only (from 2012)",
+}
 
 st.set_page_config(page_title="Fire or Factory?", layout="wide")
 
@@ -41,7 +44,7 @@ def is_static(df: pd.DataFrame, version: str) -> pd.Series:
 
 detections, calendar, disagreements = load()
 
-# ---- Header -----------------------------------------------------------------------------
+# Header
 st.title("Fire or Factory?")
 st.markdown(
     "Satellites detect **heat**, not fire. Over Sweden, much of what NASA's FIRMS hotspot "
@@ -51,7 +54,7 @@ st.markdown(
 )
 
 
-# ---- Controls -----------------------------------------------------------------------------
+# Controls
 with st.sidebar:
     st.header("Show")
     version = st.radio("Labels", list(VERSIONS), format_func=VERSIONS.get)
@@ -62,7 +65,7 @@ tab_map, tab_calendar, tab_disagree, tab_about = st.tabs(
     ["Map", "Fire calendar", "Where we disagree with FIRMS", "Method and limits"]
 )
 
-# ---- Map ----------------------------------------------------------------------------------
+# Map
 with tab_map:
     d = detections[detections["year"].between(*years)]
     if family != "ALL":
@@ -91,45 +94,67 @@ with tab_map:
     view = pdk.ViewState(latitude=62.5, longitude=16.5, zoom=4)
     st.pydeck_chart(
         pdk.Deck(
-            layers=[layer], initial_view_state=view, map_style="light",
+            layers=[layer],
+            initial_view_state=view,
+            map_style="light",
             tooltip={"text": "{kind}\n{date_utc}\n{family}"},
         ),
         height=650,
     )
-    st.caption("Orange: fire. Blue: factory or other static heat source. "
-               "Each dot is one hot pixel seen by one satellite pass.")
+    st.caption(
+        "Orange: fire. Blue: factory or other static heat source. "
+        "Each dot is one hot pixel seen by one satellite pass."
+    )
 
-# ---- Fire calendar ------------------------------------------------------------------------
+# Fire calendar
 with tab_calendar:
     st.subheader(f"Fire-days per month: {VERSIONS[version]}, {FAMILIES[family]}")
-    st.caption("A fire-day is one ~1 km grid cell with fire on one date. Many pixels, "
-               "passes and satellites seeing the same fire that day count once.")
-    sel = calendar[(calendar["family"] == family) & (calendar["version"] == version)
-                   & calendar["year"].between(*years)]
-    heat = alt.Chart(sel).mark_rect().encode(
-        x=alt.X("month:O", title="Month"),
-        y=alt.Y("year:O", title="Year"),
-        color=alt.Color("fire_days:Q", title="Fire-days", scale=alt.Scale(scheme="orangered")),
-        tooltip=["year", "month", "fire_days"],
+    st.caption(
+        "A fire-day is one ~1 km grid cell with fire on one date. Many pixels, "
+        "passes and satellites seeing the same fire that day count once."
+    )
+    sel = calendar[
+        (calendar["family"] == family)
+        & (calendar["version"] == version)
+        & calendar["year"].between(*years)
+    ]
+    heat = (
+        alt.Chart(sel)
+        .mark_rect()
+        .encode(
+            x=alt.X("month:O", title="Month"),
+            y=alt.Y("year:O", title="Year"),
+            color=alt.Color("fire_days:Q", title="Fire-days", scale=alt.Scale(scheme="orangered")),
+            tooltip=["year", "month", "fire_days"],
+        )
     )
     st.altair_chart(heat, width="stretch")
 
     st.subheader("Fire-days per year: raw vs FIRMS vs our cleaning")
-    yearly = (calendar[calendar["family"] == family]
-              .groupby(["year", "version"], as_index=False)["fire_days"].sum())
+    yearly = (
+        calendar[calendar["family"] == family]
+        .groupby(["year", "version"], as_index=False)["fire_days"]
+        .sum()
+    )
     yearly["version"] = yearly["version"].map(VERSIONS)
-    lines = alt.Chart(yearly).mark_line(point=True).encode(
-        x=alt.X("year:O", title="Year"),
-        y=alt.Y("fire_days:Q", title="Fire-days"),
-        color=alt.Color("version:N", title=None, sort=list(VERSIONS.values())),
-        tooltip=["year", "version", "fire_days"],
+    lines = (
+        alt.Chart(yearly)
+        .mark_line(point=True)
+        .encode(
+            x=alt.X("year:O", title="Year"),
+            y=alt.Y("fire_days:Q", title="Fire-days"),
+            color=alt.Color("version:N", title=None, sort=list(VERSIONS.values())),
+            tooltip=["year", "version", "fire_days"],
+        )
     )
     st.altair_chart(lines, width="stretch")
-    st.caption("VIIRS starts in 2012 and NOAA-20 adds a second VIIRS satellite from April 2018, "
-               "so 'MODIS + VIIRS' is not comparable across those years. "
-               "MODIS only is the one consistent series from 2001.")
+    st.caption(
+        "VIIRS starts in 2012 and NOAA-20 adds a second VIIRS satellite from April 2018, "
+        "so 'MODIS + VIIRS' is not comparable across those years. "
+        "MODIS only is the one consistent series from 2001."
+    )
 
-# ---- Disagreements ------------------------------------------------------------------------
+# Disagreements
 with tab_disagree:
     st.markdown(
         "Grid cells where our label and FIRMS's label disagree most, over all years. "
@@ -137,15 +162,18 @@ with tab_disagree:
         "Open a location in satellite view to check it yourself."
     )
     table = disagreements.assign(
-        map=lambda t: "https://www.google.com/maps?t=k&q=" + t["lat"].astype(str)
-        + "," + t["lon"].astype(str)
+        map=lambda t: (
+            "https://www.google.com/maps?t=k&q=" + t["lat"].astype(str) + "," + t["lon"].astype(str)
+        )
     )[["lat", "lon", "we_static", "we_fire", "cell_days", "cell_months", "families", "map"]]
     st.dataframe(
-        table, hide_index=True, width="stretch",
+        table,
+        hide_index=True,
+        width="stretch",
         column_config={"map": st.column_config.LinkColumn("Satellite view", display_text="open")},
     )
 
-# ---- Method and limits --------------------------------------------------------------------
+# Method and limits
 with tab_about:
     st.markdown(
         """

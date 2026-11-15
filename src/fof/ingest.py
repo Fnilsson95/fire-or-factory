@@ -29,7 +29,6 @@ STATUS_URL = "https://firms.modaps.eosdis.nasa.gov/mapserver/mapkey_status/"
 QUOTA_WAIT_S = 60  # seconds to wait before checking the quota again
 
 
-
 # Read the env file
 def get_key() -> str:
     load_dotenv()
@@ -67,8 +66,10 @@ def fetch_chunk(client: httpx.Client, key: str, source: str, start: date, n_days
             # Over quota, FIRMS answers 400 "Invalid MAP_KEY" even though the key is fine.
             # Wait for the 10-minute window to free up instead of failing.
             if response.status_code == 400 and quota_used_up(client, key):
-                print(f"  FIRMS quota used up at {source} {start}, waiting {QUOTA_WAIT_S} s",
-                      flush=True)
+                print(
+                    f"  FIRMS quota used up at {source} {start}, waiting {QUOTA_WAIT_S} s",
+                    flush=True,
+                )
                 time.sleep(QUOTA_WAIT_S)
                 continue
             response.raise_for_status()
@@ -81,7 +82,6 @@ def fetch_chunk(client: httpx.Client, key: str, source: str, start: date, n_days
                 status = getattr(getattr(exc, "response", None), "status_code", "n/a")
                 raise RuntimeError(f"FIRMS req failed: {source} {start} (HTTP {status})") from None
             time.sleep(2**attempt)
-
 
 
 def download(

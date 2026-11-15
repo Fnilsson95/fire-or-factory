@@ -18,12 +18,12 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import GroupKFold
 
-from fof.features import CELL_FEATURES
+from fof.features import BLOCK_FEATURES, CELL_FEATURES
 from fof.features import OUT_PATH as FEATURES_PATH
 
 OUT_PATH = Path("data/clean/classified.parquet")
 
-MODEL_FEATURES = CELL_FEATURES + ["frp", "is_night"]
+MODEL_FEATURES = CELL_FEATURES + BLOCK_FEATURES
 RULE_MIN_MONTHS = 6
 THRESHOLD = 0.5
 N_FOLDS = 5

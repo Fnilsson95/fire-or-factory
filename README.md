@@ -8,6 +8,19 @@ Built solo during the NASA Space Apps Challenge 2026 weekend (14-15 Nov) for the
 
 Of every hotspot a satellite saw over Sweden, which were real fires, and when and where does Sweden actually burn?
 
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/img/fof_map.png" alt="Map of Sweden with 2018 satellite hotspots: orange fire detections across the country, blue static sources at industrial sites"><br>
+      <sub><i>2018 hotspots over Sweden after cleaning. Orange: fire. Blue: factory or other static heat source.</i></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/img/fof_calendar.png" alt="Fire-days per year 2001-2025: raw data far above FIRMS-cleaned and our cleaned series from 2012 onwards"><br>
+      <sub><i>Fire-days per year, 2001–2025</i></sub>
+    </td>
+  </tr>
+</table>
+
 ## Planned output
 
 - A reproducible Python pipeline that ingests MODIS and VIIRS detections for Sweden into one dataset.

@@ -33,7 +33,10 @@ CELL_FEATURES = [
     "cell_frp_median",
 ]
 
-FEATURES = DETECTION_FEATURES + CELL_FEATURES
+# History of the busiest cell in each cell's 3x3 block (itself and its 8 neighbours).
+BLOCK_FEATURES = ["block_days", "block_months", "block_span_days", "block_night_share"]
+
+FEATURES = DETECTION_FEATURES + CELL_FEATURES + BLOCK_FEATURES
 
 
 def add_detection_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -80,6 +83,29 @@ def cell_features(df: pd.DataFrame):
     return cells.drop(columns=["cell_first", "cell_last"])
 
 
+def block_features(cells: pd.DataFrame) -> pd.DataFrame:
+    """For every cell, the history of the busiest cell (most active days) in its 3x3 block.
+
+    Pixel positions wobble ~0.6 km for VIIRS and more for MODIS, so a factory's detections
+    spill into neighbouring cells that have a much thinner history of their own. Looking at
+    the busiest neighbour lets those edge detections inherit the factory's history.
+    """
+    columns = ["cell_days", "cell_months", "cell_span_days", "cell_night_share"]
+    source = cells[columns].reset_index()
+    shifted = []
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            # Offer this cell's history to its neighbour at (x + dx, y + dy)
+            shifted.append(
+                source.assign(cell_x=source["cell_x"] + dx, cell_y=source["cell_y"] + dy)
+            )
+    offers = pd.concat(shifted, ignore_index=True)
+    busiest = offers.loc[offers.groupby(["cell_x", "cell_y"])["cell_days"].idxmax()]
+    busiest = busiest.set_index(["cell_x", "cell_y"])
+    busiest.columns = BLOCK_FEATURES
+    return busiest
+
+
 def build_features(
     in_path: Path = DETECTIONS_PATH, out_path: Path = OUT_PATH, cell_km: float = CELL_KM
 ) -> pd.DataFrame:
@@ -87,7 +113,10 @@ def build_features(
     df = pd.read_parquet(in_path)
     df = add_detection_features(df)
     df = add_cell_id(df, cell_km)
-    df = df.join(cell_features(df), on=["cell_x", "cell_y"])
+    cells = cell_features(df)
+    cells = cells.join(block_features(cells))
+    df = df.join(cells, on=["cell_x", "cell_y"])
+
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out_path, index=False)
@@ -95,7 +124,7 @@ def build_features(
     n_cells = df[["cell_x", "cell_y"]].drop_duplicates().shape[0]
     print(f"{len(df):,} detections in {n_cells:,} cells of {cell_km:g} km -> {out_path}")
     # Sanity check - FIRMS-static detections should sit in much busier cells
-    summary = df.groupby("firms_static")[CELL_FEATURES].median()
+    summary = df.groupby("firms_static")[CELL_FEATURES + BLOCK_FEATURES].median()
     print("\nMedian cell features, by FIRMS static label:")
     print(summary.round(2).T.to_string())
     return df

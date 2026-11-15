@@ -1,8 +1,3 @@
-<p align="center">
-  <img src="docs/img/FireOrFactory.png" alt="FireOrFactory" width="600"><br>
-  <sub><i>(Image created with AI)</i></sub>
-</p>
-
 # Fire or Factory?
 
 A cleaned satellite fire record for Sweden. It merges NASA MODIS and VIIRS hotspot detections into one validated dataset, and uses a classifier to separate real vegetation fires from industrial heat sources such as steelworks and pulp mills.
